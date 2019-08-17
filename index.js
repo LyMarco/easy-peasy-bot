@@ -93,6 +93,14 @@ controller.hears('joke', 'direct_message', function(bot, message) {
     bot.reply(message, 'Here\'s a joke!');
 });
 
+controller.hears('cheer', 'direct_message', function(bot, message) {
+    fs.readFile('Cheers/Red Hot.txt', 'utf-8', (err, data) => {
+        if (err) throw err;
+
+        bot.reply(message, data.toString());
+    });
+});
+
 /**
  * AN example of what could be:
  * Any un-handled direct mention gets a reaction and a pat response!
