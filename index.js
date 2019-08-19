@@ -79,7 +79,6 @@ controller.on('rtm_close', function (bot) {
 /**
  * Core bot logic goes here!
  */
-// BEGIN EDITING HERE!
 
 controller.on('bot_channel_join', function (bot, message) {
     bot.reply(message, "I'm here!")
@@ -89,31 +88,74 @@ controller.hears('hello', 'direct_message', function (bot, message) {
     bot.reply(message, 'Hello!');
 });
 
-controller.hears('joke', 'direct_message', function(bot, message) {
-    bot.reply(message, 'Here\'s a joke!');
-});
+const fs = require('fs');
+const readline = require('readline');
+const axios = require('axios');
+
+
+
+/*controller.hears('joke', 'direct_message', function(bot, message) {
+    // bot.reply(message, 'Here\'s a joke!');
+    axios.get('https://icanhazdadjoke.com/', {
+        params: {
+            Accept: 'text/plain'
+        }
+    })
+    .then(response => {
+        console.log(response);
+    })
+    .catch(error => {
+        console.log(error);
+    })
+    // axios.get('/jokes', function(request, response) {
+    //     const requestOptions = {
+    //         uri: 'https://icanhazdadjoke.com/',
+    //         headers: {
+    //           Accept: 'application/json'
+    //         },
+    //         json: true
+    //      };
+
+});*/
 
 controller.hears('cheer', 'direct_message', function(bot, message) {
-    fs.readFile('Cheers/Red Hot.txt', 'utf-8', (err, data) => {
-        if (err) throw err;
+    var cheerNumber = randomInt(0, 9);
 
-        bot.reply(message, data.toString());
-    });
+    bot.reply(message, 'Oh, here\'s a good one!');
+    
+    // create instance of readline
+    let rl = readline.createInterface({
+        input: fs.createReadStream('Cheers/' + cheerNumber + '.txt')
+    })
+
+    let lineNo = 0;
+    rl.on('line', function(line) {
+        if (lineNo == 0) {
+            bot.reply(message, 'It\'s called ' + line + '!');
+        } else {
+            bot.reply(message, line);    
+        }
+        lineNo++;
+    }) 
 });
 
 /**
  * AN example of what could be:
  * Any un-handled direct mention gets a reaction and a pat response!
- */
-//controller.on('direct_message,mention,direct_mention', function (bot, message) {
-//    bot.api.reactions.add({
-//        timestamp: message.ts,
-//        channel: message.channel,
-//        name: 'robot_face',
-//    }, function (err) {
-//        if (err) {
-//            console.log(err)
-//        }
-//        bot.reply(message, 'I heard you loud and clear boss.');
-//    });
-//});
+ 
+controller.on('direct_message,mention,direct_mention', function (bot, message) {
+   bot.api.reactions.add({
+       timestamp: message.ts,
+       channel: message.channel,
+       name: 'robot_face',
+   }, function (err) {
+       if (err) {
+           console.log(err)
+       }
+       bot.reply(message, 'I heard you loud and clear boss.');
+   });
+});
+
+function randomInt(low, high) {
+    return Math.floor(Math.random() * (high - low + 1) + low)
+}
