@@ -94,29 +94,21 @@ const axios = require('axios');
 
 
 
-/*controller.hears('joke', 'direct_message', function(bot, message) {
+controller.hears('joke', 'direct_message', function(bot, message) {
     // bot.reply(message, 'Here\'s a joke!');
-    axios.get('https://icanhazdadjoke.com/', {
-        params: {
-            Accept: 'text/plain'
-        }
+    axios({
+        url: "https://icanhazdadjoke.com/",
+        method: 'get',
+        headers: {"Accept" : "application/json"}
     })
     .then(response => {
-        console.log(response);
+        // console.log(response.data.joke);
+        bot.reply(message, response.data.joke);
     })
     .catch(error => {
         console.log(error);
     })
-    // axios.get('/jokes', function(request, response) {
-    //     const requestOptions = {
-    //         uri: 'https://icanhazdadjoke.com/',
-    //         headers: {
-    //           Accept: 'application/json'
-    //         },
-    //         json: true
-    //      };
-
-});*/
+});
 
 controller.hears('cheer', 'direct_message', function(bot, message) {
     var cheerNumber = randomInt(0, 9);
