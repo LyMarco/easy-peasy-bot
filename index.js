@@ -1,5 +1,5 @@
 /**
- * A Bot for Slack!
+ * A Bot for Slack, handles slash commands. Forked from slackapi/easy-peasy-bots
  */
 
 
@@ -39,7 +39,7 @@ if (process.env.MONGOLAB_URI) {
 }
 
 /**
- * Are being run as an app or a custom integration? The initialization will differ, depending
+ * Initialize controller
  */
 
 if (process.env.TOKEN || process.env.SLACK_TOKEN) {
@@ -61,9 +61,7 @@ if (process.env.TOKEN || process.env.SLACK_TOKEN) {
  * A demonstration for how to handle websocket events. In this case, just log when we have and have not
  * been disconnected from the websocket. In the future, it would be super awesome to be able to specify
  * a reconnect policy, and do reconnections automatically. In the meantime, we aren't going to attempt reconnects,
- * WHICH IS A B0RKED WAY TO HANDLE BEING DISCONNECTED. So we need to fix this.
- *
- * TODO: fixed b0rked reconnect behavior
+ * Bad way to handle closing. Needs a fix.
  */
 // Handle events related to the websocket connection to Slack
 controller.on('rtm_open', function (bot) {
@@ -99,7 +97,9 @@ controller.hears('joke', 'direct_message', function(bot, message) {
     axios({
         url: "https://icanhazdadjoke.com/",
         method: 'get',
-        headers: {"Accept" : "application/json"}
+        headers: {"Accept" : "application/json",
+                "User-Agent" : "Slackbot for fun (https://github.com/LyMarco/goliath-bot)"
+            }
     })
     .then(response => {
         // console.log(response.data.joke);
