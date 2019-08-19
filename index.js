@@ -142,7 +142,7 @@ controller.hears('cheer', 'direct_message', function(bot, message) {
 /**
  * AN example of what could be:
  * Any un-handled direct mention gets a reaction and a pat response!
- 
+ */
 controller.on('direct_message,mention,direct_mention', function (bot, message) {
    bot.api.reactions.add({
        timestamp: message.ts,
