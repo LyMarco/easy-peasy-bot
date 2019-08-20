@@ -172,16 +172,24 @@ controller.on('direct_message, mention, direct_mention', function (bot, message)
  * ===================
  */ 
 
- controller.on('slash_command', function(bot, message) {
-    bot.replyAcknowledge();
+controller.on('slash_command', function(bot, message) {
+    // bot.replyAcknowledge();
     switch (message.command) {
         case "/echo":
-            bot.reply(message, 'ECHO! Echo! echo! echo...');
+            bot.replyPrivate(message, 'ECHO! Echo! echo! echo...');
             break;
+        case "/notifyall":
+            bot.sendWebhook({
+                text: message.text,
+            } , function (err, response) {
+                if (err) {
+                    console.log('webhook error', err);
+                }
+            })
         default:
-            bot.reply(message, 'Did not recognize that command, sorry!');
+            bot.replyPrivate(message, 'Did not recognize that command, sorry!');
     }
- });
+});
 
 /**
  * =============================
