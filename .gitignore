@@ -28,4 +28,9 @@ build/Release
 # https://www.npmjs.org/doc/misc/npm-faq.html#should-i-check-my-node_modules-folder-into-git
 node_modules
 
+# Environment variables
 .env
+
+# Local storage with sensitive information
+db_slack_bot_cri.*
+

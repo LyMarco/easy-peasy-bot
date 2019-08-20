@@ -92,22 +92,24 @@ controller.on('rtm_close', function (bot) {
 
 
 /**
- * Core bot logic goes here!
+ * =============================
+ * =====  Core bot logic =======
+ * =============================
  */
 
 controller.on('bot_channel_join', function (bot, message) {
     bot.reply(message, "I'm here!")
 });
 
+/**
+ * ========================
+ * Handling direct messages
+ * ========================
+ */
+
 controller.hears('hello', 'direct_message', function (bot, message) {
     bot.reply(message, 'Hello!');
 });
-
-const fs = require('fs');
-const readline = require('readline');
-const axios = require('axios');
-
-
 
 controller.hears('joke', 'direct_message', function(bot, message) {
     // bot.reply(message, 'Here\'s a joke!');
@@ -149,10 +151,9 @@ controller.hears('cheer', 'direct_message', function(bot, message) {
 });
 
 /**
- * AN example of what could be:
  * Any un-handled direct mention gets a reaction and a pat response!
  */
-controller.on('direct_message,mention,direct_mention', function (bot, message) {
+controller.on('direct_message, mention, direct_mention', function (bot, message) {
    bot.api.reactions.add({
        timestamp: message.ts,
        channel: message.channel,
@@ -164,6 +165,35 @@ controller.on('direct_message,mention,direct_mention', function (bot, message) {
        bot.reply(message, 'I heard you loud and clear boss.');
    });
 });
+
+/**
+ * ===================
+ * Slash Commands
+ * ===================
+ */ 
+
+ controller.on('slash_command', function(bot, message) {
+    bot.replyAcknowledge();
+    switch (message.command) {
+        case "/echo":
+            bot.reply(message, 'ECHO! Echo! echo! echo...');
+            break;
+        default:
+            bot.reply(message, 'Did not recognize that command, sorry!');
+    }
+ });
+
+/**
+ * =============================
+ * ==== Core bot logic end =====
+ * =============================
+ */
+
+/**
+ * ================
+ * Helper functions
+ * ================
+ */
 
 function randomInt(low, high) {
     return Math.floor(Math.random() * (high - low + 1) + low)
