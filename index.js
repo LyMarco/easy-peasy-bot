@@ -67,7 +67,7 @@ if (bot_capable || command_capable) {
     var app = require('./lib/apps');
     var token = (process.env.TOKEN) ? process.env.TOKEN : process.env.SLACK_TOKEN;
     var controller = app.configure(process.env.PORT, process.env.CLIENT_ID, process.env.CLIENT_SECRET, 
-        process.env.CLIENT_SIGNING_SECRET, token, config, onInstallation);
+        process.env.CLIENT_SIGNING_SECRET, token, process.env.VERIFICATION_TOKEN, config, onInstallation);
 } else {
     console.log('Error: Please specify proper environment variables for at least a bot or slash command app.');
     process.exit(1);
@@ -97,6 +97,10 @@ controller.on('rtm_close', function (bot) {
  * =============================
  */
 
+const fs = require('fs');  
+const readline = require('readline');
+const axios = require('axios');
+
 controller.on('bot_channel_join', function (bot, message) {
     bot.reply(message, "I'm here!");
     // console.log(message);
@@ -113,7 +117,7 @@ controller.hears('hello', 'direct_message', function (bot, message) {
 });
 
 controller.hears('joke', 'direct_message', function(bot, message) {
-    // bot.reply(message, 'Here\'s a joke!');
+    bot.reply(message, 'Here\'s a joke!');
     axios({
         url: "https://icanhazdadjoke.com/",
         method: 'get',
