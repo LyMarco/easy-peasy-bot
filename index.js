@@ -98,7 +98,8 @@ controller.on('rtm_close', function (bot) {
  */
 
 controller.on('bot_channel_join', function (bot, message) {
-    bot.reply(message, "I'm here!")
+    bot.reply(message, "I'm here!");
+    // console.log(message);
 });
 
 /**
@@ -179,13 +180,15 @@ controller.on('slash_command', function(bot, message) {
             bot.replyPrivate(message, 'ECHO! Echo! echo! echo...');
             break;
         case "/notifyall":
+            bot.replyPrivate(message, 'I\'m on it!');
             bot.sendWebhook({
                 text: message.text,
             } , function (err, response) {
                 if (err) {
                     console.log('webhook error', err);
                 }
-            })
+            });
+            break;
         default:
             bot.replyPrivate(message, 'Did not recognize that command, sorry!');
     }
