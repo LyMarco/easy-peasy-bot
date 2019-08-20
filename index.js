@@ -2,8 +2,6 @@
  * A Bot for Slack, handles slash commands. Forked from slackapi/easy-peasy-bots
  */
 
-// For development, using a .env file to quickly deploy environment variables (ty Code Realm)
-require('dotenv').config(); 
 
 /**
  * Define a function for initiating a conversation on installation
@@ -33,14 +31,10 @@ if (process.env.MONGOLAB_URI) {
     var BotkitStorage = require('botkit-storage-mongo');
     config = {
         storage: BotkitStorage({mongoUri: process.env.MONGOLAB_URI}),
-        // debug: true,
-        clientSigningSecret: process.env.CLIENT_SIGNING_SECRET,
     };
 } else {
     config = {
-        json_file_store: ((process.env.TOKEN) ?'./db_slack_bot_ci/':'./db_slack_bot_a/'), //use a different name if an app or CI
-        // debug: true,
-        clientSigningSecret: process.env.CLIENT_SIGNING_SECRET,
+        json_file_store: ((process.env.TOKEN)?'./db_slack_bot_ci/':'./db_slack_bot_a/'), //use a different name if an app or CI
     };
 }
 
@@ -48,28 +42,17 @@ if (process.env.MONGOLAB_URI) {
  * Initialize controller
  */
 
-// We want to try treating this as an app since custom integrations may not be a thing in slack for future
-var bot_capable = process.env.TOKEN || process.env.SLACK_TOKEN;
-var command_capable = process.env.CLIENT_ID && process.env.CLIENT_SECRET && process.env.PORT && process.env.VERIFICATION_TOKEN;
-if (!bot_capable) {
-    console.log('Warning: Environment variables for bot (TOKEN or SLACK_TOKEN) are not present');
-}
-if (!command_capable) {
-    console.log('Warning: Environment variables for slash command app (PORT, CLIENT_ID, CLIENT_SECRET and VERIFICATION_TOKEN) are not present');
-}
-/*if (process.env.TOKEN || process.env.SLACK_TOKEN) {
+if (process.env.TOKEN || process.env.SLACK_TOKEN) {
     //Treat this as a custom integration
     var customIntegration = require('./lib/custom_integrations');
     var token = (process.env.TOKEN) ? process.env.TOKEN : process.env.SLACK_TOKEN;
-    var controller = customIntegration.configure(token, config, onInstallation);*/
-if (bot_capable || command_capable) {
+    var controller = customIntegration.configure(token, config, onInstallation);
+} else if (process.env.CLIENT_ID && process.env.CLIENT_SECRET && process.env.PORT) {
     //Treat this as an app
     var app = require('./lib/apps');
-    var token = (process.env.TOKEN) ? process.env.TOKEN : process.env.SLACK_TOKEN;
-    var controller = app.configure(process.env.PORT, process.env.CLIENT_ID, process.env.CLIENT_SECRET, 
-        process.env.CLIENT_SIGNING_SECRET, token, config, onInstallation);
+    var controller = app.configure(process.env.PORT, process.env.CLIENT_ID, process.env.CLIENT_SECRET, config, onInstallation);
 } else {
-    console.log('Error: Please specify proper environment variables for at least a bot or slash command app.');
+    console.log('Error: If this is a custom integration, please specify TOKEN in the environment. If this is an app, please specify CLIENTID, CLIENTSECRET, and PORT in the environment');
     process.exit(1);
 }
 
