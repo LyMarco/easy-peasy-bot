@@ -103,7 +103,7 @@ const axios = require('axios');
 
 controller.on('bot_channel_join', function (bot, message) {
     bot.reply(message, "I'm here!");
-    // console.log(message);
+    console.log(message);
 });
 
 /**
@@ -155,10 +155,30 @@ function joke(bot, message) {
     })
 }
 
+function weather(bot, message, city) {
+    axios({
+        url: 'https://api.openweathermap.org/data/2.5/find?q='+city+',ca&units=metric&appid=' + process.env.OWM_API_KEY,
+        method: 'get',
+    })
+    .then(response => {
+        var weather_data = response.data.list[0];
+        var weather_info = 'Right now in ' + city + ' we\'re experiencing ' + weather_data.weather[0].description;
+        weather_info += '\n The current temperature is ' + weather_data.main.temp + ' degrees!';
+        weather_info += '\n Humidity is at ' + weather_data.main.humidity + '%, and wind speed is ' + weather_data.wind.speed + 'm/s!';
+
+        // console.log(response.data);
+        // console.log(weather_data.main);
+        bot.reply(message, weather_info);
+    })
+    .catch(error => {
+        console.log(error);
+    })
+}
+
 function cheers(bot, message) {
     var cheerNumber = randomInt(0, 9);
 
-    switch (randomInt(0, 3)) {
+    /*switch (randomInt(0, 3)) {
         case 0:
             bot.reply(message, 'Oh, here\'s a good one!');
             break;
@@ -170,8 +190,8 @@ function cheers(bot, message) {
             break;
         default:
             bot.reply(message, 'Here\'s a cheer!');
-    }
-    
+    }*/
+    bot.reply(message, 'Oh, here\'s a good one!'); 
     
     // create instance of readline
     let rl = readline.createInterface({
@@ -197,7 +217,7 @@ function cheers(bot, message) {
  * Any un-handled direct mention gets a reaction and a pat response!
  */
 controller.on('direct_message', function (bot, message) {
-    console.log(message);
+    // console.log(message);
 
     handleMessages(bot, message, message.text);
 
@@ -236,17 +256,21 @@ controller.on('mention, direct_mention', function (bot, message) {
 
 controller.on('slash_command', function(bot, message) {
     // bot.replyAcknowledge();
+    // console.log('SLASH MESSAGE ' + message);
     switch (message.command) {
         case "/echo":
             bot.replyPrivate(message, 'ECHO! Echo! echo! echo...');
             break;
         case "/notifyall":
             bot.replyPrivate(message, 'I\'m on it!');
+            bot.config.incoming_webhook = { url: 'https://hooks.slack.com/services/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'};
+            console.log(message);
+            // console.log(bot.config.incoming_webhook.url);
             bot.sendWebhook({
                 text: message.text,
             } , function (err, response) {
                 if (err) {
-                    console.log('webhook error', err);
+                    console.log('Webhook Error: ', err);
                 }
             });
             break;
@@ -274,10 +298,21 @@ function randomInt(low, high) {
 function handleMessages(bot, message, text) {
     if (text.includes('hello')) {
         greetings(bot, message);
-    } else if (text.includes(' joke')) {
+    } else if (text.includes('joke')) {
         joke(bot, message);
-    } else if (text.includes(' cheer')) {
+    } else if (text.includes('cheer')) {
         cheers(bot, message);
+    } else if (text.includes('weather')) {
+        weather(bot, message, 'Toronto');
+    } else if (text.includes('webhook')) {
+        console.log(bot.config.incoming_webhook.url);
+            bot.sendWebhook({
+                text: message.text,
+            } , function (err, response) {
+                if (err) {
+                    console.log('webhook error', err);
+                }
+            });
     } else {
         bot.reply(message, 'I heard you loud and clear boss.');
     }
