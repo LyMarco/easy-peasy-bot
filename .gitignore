@@ -34,3 +34,5 @@ node_modules
 # Local storage with sensitive information
 db_slack_bot_ci/*
 
+# Hiding from Heroku
+package-lock.json
