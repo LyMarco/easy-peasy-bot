@@ -112,12 +112,33 @@ controller.on('bot_channel_join', function (bot, message) {
  * ========================
  */
 
-controller.hears('hello', 'direct_message', function (bot, message) {
-    bot.reply(message, 'Hello!');
+controller.hears('hello', 'direct_mention, mention', function (bot, message) {
+    // console.log(message);
+    // bot.reply(message, 'Hello!');
+    greetings(bot, message);
 });
 
-controller.hears('joke', 'direct_message', function(bot, message) {
-    bot.reply(message, 'Here\'s a joke!');
+function greetings(bot, message) {
+    message.event = 'mention';
+
+    bot.reply(message, 'Hello!');
+}
+
+function joke(bot, message) {
+    switch (randomInt(0, 3)) {
+        case 0:
+            bot.reply(message, 'This one is hilarious!');
+            break;
+        case 1:
+            bot.reply(message, 'Oh, this one is a gut-wrencher!');
+            break;
+        case 2: 
+            bot.reply(message, 'This one\'s a personal favourite!');
+            break;
+        default:
+            bot.reply(message, 'Here\'s a joke!');
+    }
+
     axios({
         url: "https://icanhazdadjoke.com/",
         method: 'get',
@@ -132,12 +153,25 @@ controller.hears('joke', 'direct_message', function(bot, message) {
     .catch(error => {
         console.log(error);
     })
-});
+}
 
-controller.hears('cheer', 'direct_message', function(bot, message) {
+function cheers(bot, message) {
     var cheerNumber = randomInt(0, 9);
 
-    bot.reply(message, 'Oh, here\'s a good one!');
+    switch (randomInt(0, 3)) {
+        case 0:
+            bot.reply(message, 'Oh, here\'s a good one!');
+            break;
+        case 1:
+            bot.reply(message, 'This cheer\'s pretty hype!');
+            break;
+        case 2: 
+            bot.reply(message, 'This one\'s a personal favourite!');
+            break;
+        default:
+            bot.reply(message, 'Here\'s a cheer!');
+    }
+    
     
     // create instance of readline
     let rl = readline.createInterface({
@@ -153,22 +187,45 @@ controller.hears('cheer', 'direct_message', function(bot, message) {
         }
         lineNo++;
     }) 
-});
+};
+
+/*controller.on('direct_mention, direct_message, mention', function(bot, message) {
+    console.log(message);
+});*/
 
 /**
  * Any un-handled direct mention gets a reaction and a pat response!
  */
-controller.on('direct_message, mention, direct_mention', function (bot, message) {
-   bot.api.reactions.add({
-       timestamp: message.ts,
-       channel: message.channel,
-       name: 'robot_face',
-   }, function (err) {
-       if (err) {
-           console.log(err)
-       }
-       bot.reply(message, 'I heard you loud and clear boss.');
-   });
+controller.on('direct_message', function (bot, message) {
+    console.log(message);
+
+    handleMessages(bot, message, message.text);
+
+    /*bot.api.reactions.add({
+    timestamp: message.ts,
+    channel: message.channel,
+    name: 'robot_face',
+        }, function (err) {
+    if (err) {
+       console.log(err)
+    }
+    bot.reply(message, 'I heard you loud and clear boss.');
+    });*/
+});
+
+controller.on('mention, direct_mention', function (bot, message) {
+    console.log(message);
+
+    bot.api.reactions.add({
+    timestamp: message.ts,
+    channel: message.channel,
+    name: 'robot_face',
+        }, function (err) {
+    if (err) {
+       console.log(err)
+    }
+    bot.reply(message, 'I heard you loud and clear boss.');
+    });
 });
 
 /**
@@ -212,4 +269,16 @@ controller.on('slash_command', function(bot, message) {
 
 function randomInt(low, high) {
     return Math.floor(Math.random() * (high - low + 1) + low)
+}
+
+function handleMessages(bot, message, text) {
+    if (text.includes('hello')) {
+        greetings(bot, message);
+    } else if (text.includes(' joke')) {
+        joke(bot, message);
+    } else if (text.includes(' cheer')) {
+        cheers(bot, message);
+    } else {
+        bot.reply(message, 'I heard you loud and clear boss.');
+    }
 }
