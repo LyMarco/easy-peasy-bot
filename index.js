@@ -175,43 +175,60 @@ function weather(bot, message, city) {
     })
 }
 
-function cheers(bot, message) {
+async function cheers(bot, message) {
     var cheerNumber = randomInt(0, 9);
 
-    /*switch (randomInt(0, 3)) {
+    await cheerHelper(bot, message);
+    
+    // bot.reply(message, 'Oh, here\'s a good one!'); 
+    
+    fs.readFile('Cheers/' + cheerNumber + '.txt', 'utf8', (err, data) => {
+        if (err) console.log(err);
+        bot.reply(message, data);
+    });
+   
+}
+
+// I'm really bad at async
+async function cheerHelper(bot, message) {
+
+    switch (randomInt(0, 3)) {
         case 0:
+            // return 'Oh, here\'s a good one!';
             bot.reply(message, 'Oh, here\'s a good one!');
             break;
         case 1:
+            // return 'This cheer\'s pretty hype!';
             bot.reply(message, 'This cheer\'s pretty hype!');
             break;
         case 2: 
+            // return 'This one\'s a personal favourite!';
             bot.reply(message, 'This one\'s a personal favourite!');
             break;
         default:
+            // return 'Here\'s a cheer!';
             bot.reply(message, 'Here\'s a cheer!');
-    }*/
-    bot.reply(message, 'Oh, here\'s a good one!'); 
-    
-    // create instance of readline
+    }
+
+    /*// create instance of readline
     let rl = readline.createInterface({
         input: fs.createReadStream('Cheers/' + cheerNumber + '.txt')
     })
 
     let lineNo = 0;
-    rl.on('line', function(line) {
+    await rl.on('line', async function(line) {
         if (lineNo == 0) {
             bot.reply(message, 'It\'s called ' + line + '!');
         } else {
             bot.reply(message, line);    
         }
         lineNo++;
-    }) 
-};
+    }) */
+}
 
 /*controller.on('direct_mention, direct_message, mention', function(bot, message) {
     console.log(message);
-});*/
+});
 
 /**
  * Any un-handled direct mention gets a reaction and a pat response!
@@ -314,6 +331,13 @@ function handleMessages(bot, message, text) {
                 }
             });
     } else {
+        bot.api.channels.list({}, function(err, response) {
+            if (err) {
+                console.log(err);
+            } else {
+                console.log(response);
+            }
+        });
         bot.reply(message, 'I heard you loud and clear boss.');
     }
 }
