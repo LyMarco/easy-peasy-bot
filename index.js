@@ -178,9 +178,9 @@ function weather(bot, message, city) {
 async function cheers(bot, message) {
     var cheerNumber = randomInt(0, 9);
 
-    await cheerHelper(bot, message);
+    // await cheerHelper(bot, message);
     
-    // bot.reply(message, 'Oh, here\'s a good one!'); 
+    bot.reply(message, 'Oh, here\'s a good one!'); 
     
     fs.readFile('Cheers/' + cheerNumber + '.txt', 'utf8', (err, data) => {
         if (err) console.log(err);
@@ -313,15 +313,15 @@ function randomInt(low, high) {
 }
 
 function handleMessages(bot, message, text) {
-    if (text.includes('hello')) {
+    if (text.toLowerCase().includes('hello')) {
         greetings(bot, message);
-    } else if (text.includes('joke')) {
+    } else if (text.toLowerCase().includes('joke')) {
         joke(bot, message);
-    } else if (text.includes('cheer')) {
+    } else if (text.toLowerCase().includes('cheer')) {
         cheers(bot, message);
-    } else if (text.includes('weather')) {
+    } else if (text.toLowerCase().includes('weather')) {
         weather(bot, message, 'Toronto');
-    } else if (text.includes('webhook')) {
+    } else if (text.toLowerCase().includes('webhook')) {
         console.log(bot.config.incoming_webhook.url);
             bot.sendWebhook({
                 text: message.text,
