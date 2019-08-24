@@ -280,7 +280,7 @@ controller.on('slash_command', function(bot, message) {
             break;
         case "/notifyall":
             bot.replyPrivate(message, 'I\'m on it!');
-            bot.config.incoming_webhook = { url: 'https://hooks.slack.com/services/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'};
+            /*bot.config.incoming_webhook = { url: 'https://hooks.slack.com/services/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'};
             console.log(message);
             // console.log(bot.config.incoming_webhook.url);
             bot.sendWebhook({
@@ -289,7 +289,23 @@ controller.on('slash_command', function(bot, message) {
                 if (err) {
                     console.log('Webhook Error: ', err);
                 }
+            });*/
+
+            bot.api.channels.list({}, function(err, response) {
+                if (err) {
+                    console.log(err);
+                } else {
+                    for (channel in response.channels) {
+                        console.log(channel);
+                        console.log("HELLO");
+                        // message.channel = channel.id;
+                        // bot.reply(message, message.text);
+                    }
+                }
             });
+
+            
+
             break;
         default:
             bot.replyPrivate(message, 'Did not recognize that command, sorry!');
