@@ -83,6 +83,7 @@ if (bot_capable || command_capable) {
 // Handle events related to the websocket connection to Slack
 controller.on('rtm_open', function (bot) {
     console.log('** The RTM api just connected!');
+    myBot = bot;
 });
 
 controller.on('rtm_close', function (bot) {
@@ -112,7 +113,7 @@ controller.on('bot_channel_join', function (bot, message) {
  * ========================
  */
 
-controller.hears('hello', 'direct_mention, mention', function (bot, message) {
+controller.hears('^hello$', 'direct_mention, mention', function (bot, message) {
     // console.log(message);
     // bot.reply(message, 'Hello!');
     greetings(bot, message);
@@ -273,7 +274,8 @@ controller.on('mention, direct_mention', function (bot, message) {
 
 controller.on('slash_command', function(bot, message) {
     // bot.replyAcknowledge();
-    // console.log('SLASH MESSAGE ' + message);
+    console.log('SLASH MESSAGE ', message);
+
     switch (message.command) {
         case "/echo":
             bot.replyPrivate(message, 'ECHO! Echo! echo! echo...');
@@ -293,19 +295,43 @@ controller.on('slash_command', function(bot, message) {
 
             bot.api.channels.list({}, function(err, response) {
                 if (err) {
-                    console.log(err);
+                    console.log('Problem with getting list of channels: ', err);
                 } else {
-                    for (channel in response.channels) {
-                        console.log(channel);
-                        console.log("HELLO");
-                        // message.channel = channel.id;
-                        // bot.reply(message, message.text);
-                    }
+                    response.channels.forEach(function(channel) {
+                        console.log(channel.id); 
+                        // console.log(message);
+                        /*var message_to_channel = {
+                            token: process.env.SLACK_TOKEN,
+                            channel: channel.id,
+                            text: message.text,
+                        };*/
+
+                       /* axios({
+                            method: 'post',
+                            url: "https://slack.com/api/chat.postMessage",
+                            data: {
+                                Content-type: 'application/json',
+                                Authorization: process.env.SLACK_TOKEN,
+                                {
+                                    channel: channel.id,
+                                    text: "hello",
+                                },
+                            }
+                        });*/
+
+                        bot.api.chat.postMessage(
+                            {
+                                channel: channel.id,
+                                text: message.text,
+                            }
+                            , function(err, response) {
+                            if (err) {
+                                console.log(err);
+                            }
+                        });
+                    });
                 }
             });
-
-            
-
             break;
         default:
             bot.replyPrivate(message, 'Did not recognize that command, sorry!');
@@ -346,14 +372,30 @@ function handleMessages(bot, message, text) {
                     console.log('webhook error', err);
                 }
             });
-    } else {
+    } else if (text.toLowerCase().includes('post')) {
         bot.api.channels.list({}, function(err, response) {
             if (err) {
                 console.log(err);
             } else {
-                console.log(response);
+                response.channels.forEach(function(channel) {
+                    console.log(channel.id); 
+                    var message_to_channel = {
+                        
+                        channel: channel.id,
+                        text: 'hello',
+                    };
+
+                    bot.api.chat.postMessage(message_to_channel, function(err, response) {
+                        if (err) {
+                            console.log(err);
+                        }
+                        console.log(response);
+                    });
+                });
             }
         });
+        
+    } else {
         bot.reply(message, 'I heard you loud and clear boss.');
     }
 }
