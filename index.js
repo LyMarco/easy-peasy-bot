@@ -113,254 +113,17 @@ controller.on('bot_channel_join', function (bot, message) {
  * ========================
  */
 
-controller.hears('^hello$', 'direct_mention, mention', function (bot, message) {
-    // console.log(message);
-    // bot.reply(message, 'Hello!');
-    greetings(bot, message);
-});
-
-function greetings(bot, message) {
-    message.event = 'mention';
-
-    bot.reply(message, 'Hello!');
-}
-
-function joke(bot, message) {
-    switch (randomInt(0, 3)) {
-        case 0:
-            bot.reply(message, 'This one is hilarious!');
-            break;
-        case 1:
-            bot.reply(message, 'Oh, this one is a gut-wrencher!');
-            break;
-        case 2: 
-            bot.reply(message, 'This one\'s a personal favourite!');
-            break;
-        default:
-            bot.reply(message, 'Here\'s a joke!');
-    }
-
-    axios({
-        url: "https://icanhazdadjoke.com/",
-        method: 'get',
-        headers: {"Accept" : "application/json",
-                "User-Agent" : "Slackbot for fun (https://github.com/LyMarco/goliath-bot)"
-            }
-    })
-    .then(response => {
-        // console.log(response.data.joke);
-        bot.reply(message, response.data.joke);
-    })
-    .catch(error => {
-        console.log(error);
-    })
-}
-
-function weather(bot, message, city) {
-    axios({
-        url: 'https://api.openweathermap.org/data/2.5/find?q='+city+',ca&units=metric&appid=' + process.env.OWM_API_KEY,
-        method: 'get',
-    })
-    .then(response => {
-        var weather_data = response.data.list[0];
-        var weather_info = 'Right now in ' + city + ' we\'re experiencing ' + weather_data.weather[0].description;
-        weather_info += '\n The current temperature is ' + weather_data.main.temp + ' degrees!';
-        weather_info += '\n Humidity is at ' + weather_data.main.humidity + '%, and wind speed is ' + weather_data.wind.speed + 'm/s!';
-
-        // console.log(response.data);
-        // console.log(weather_data.main);
-        bot.reply(message, weather_info);
-    })
-    .catch(error => {
-        console.log(error);
-    })
-}
-
-async function cheers(bot, message) {
-    var cheerNumber = randomInt(0, 9);
-
-    // await cheerHelper(bot, message);
-    
-    bot.reply(message, 'Oh, here\'s a good one!'); 
-    
-    fs.readFile('Cheers/' + cheerNumber + '.txt', 'utf8', (err, data) => {
-        if (err) console.log(err);
-        bot.reply(message, data);
-    });
-   
-}
-
-// I'm really bad at async
-async function cheerHelper(bot, message) {
-
-    switch (randomInt(0, 3)) {
-        case 0:
-            // return 'Oh, here\'s a good one!';
-            bot.reply(message, 'Oh, here\'s a good one!');
-            break;
-        case 1:
-            // return 'This cheer\'s pretty hype!';
-            bot.reply(message, 'This cheer\'s pretty hype!');
-            break;
-        case 2: 
-            // return 'This one\'s a personal favourite!';
-            bot.reply(message, 'This one\'s a personal favourite!');
-            break;
-        default:
-            // return 'Here\'s a cheer!';
-            bot.reply(message, 'Here\'s a cheer!');
-    }
-
-    /*// create instance of readline
-    let rl = readline.createInterface({
-        input: fs.createReadStream('Cheers/' + cheerNumber + '.txt')
-    })
-
-    let lineNo = 0;
-    await rl.on('line', async function(line) {
-        if (lineNo == 0) {
-            bot.reply(message, 'It\'s called ' + line + '!');
-        } else {
-            bot.reply(message, line);    
-        }
-        lineNo++;
-    }) */
-}
-
-/*controller.on('direct_mention, direct_message, mention', function(bot, message) {
-    console.log(message);
-});
-
-/**
- * Any un-handled direct mention gets a reaction and a pat response!
- */
-controller.on('direct_message', function (bot, message) {
-    // console.log(message);
-
+/*controller.on('direct_message, direct_mention, mention', function (bot, message) {
     handleMessages(bot, message, message.text);
-
-    /*bot.api.reactions.add({
-    timestamp: message.ts,
-    channel: message.channel,
-    name: 'robot_face',
-        }, function (err) {
-    if (err) {
-       console.log(err)
-    }
-    bot.reply(message, 'I heard you loud and clear boss.');
-    });*/
 });
-
-controller.on('mention, direct_mention', function (bot, message) {
-    console.log(message);
-
-    bot.api.reactions.add({
-    timestamp: message.ts,
-    channel: message.channel,
-    name: 'robot_face',
-        }, function (err) {
-    if (err) {
-       console.log(err)
-    }
-    bot.reply(message, 'I heard you loud and clear boss.');
-    });
-});
-
-/**
- * ===================
- * Slash Commands
- * ===================
- */ 
-
-controller.on('slash_command', function(bot, message) {
-    // bot.replyAcknowledge();
-    console.log('SLASH MESSAGE ', message);
-
-    switch (message.command) {
-        case "/echo":
-            bot.replyPrivate(message, 'ECHO! Echo! echo! echo...');
-            break;
-        case "/notifyall":
-            bot.replyPrivate(message, 'I\'m on it!');
-            /*bot.config.incoming_webhook = { url: 'https://hooks.slack.com/services/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'};
-            console.log(message);
-            // console.log(bot.config.incoming_webhook.url);
-            bot.sendWebhook({
-                text: message.text,
-            } , function (err, response) {
-                if (err) {
-                    console.log('Webhook Error: ', err);
-                }
-            });*/
-
-            bot.api.channels.list({}, function(err, response) {
-                if (err) {
-                    console.log('Problem with getting list of channels: ', err);
-                } else {
-                    response.channels.forEach(function(channel) {
-                        console.log(channel.id); 
-                        // console.log(message);
-                        /*var message_to_channel = {
-                            token: process.env.SLACK_TOKEN,
-                            channel: channel.id,
-                            text: message.text,
-                        };*/
-
-                       /* axios({
-                            method: 'post',
-                            url: "https://slack.com/api/chat.postMessage",
-                            data: {
-                                Content-type: 'application/json',
-                                Authorization: process.env.SLACK_TOKEN,
-                                {
-                                    channel: channel.id,
-                                    text: "hello",
-                                },
-                            }
-                        });*/
-
-                        bot.api.chat.postMessage(
-                            {
-                                channel: channel.id,
-                                text: message.text,
-                            }
-                            , function(err, response) {
-                            if (err) {
-                                console.log(err);
-                            }
-                        });
-                    });
-                }
-            });
-            break;
-        default:
-            bot.replyPrivate(message, 'Did not recognize that command, sorry!');
-    }
-});
-
-/**
- * =============================
- * ==== Core bot logic end =====
- * =============================
- */
-
-/**
- * ================
- * Helper functions
- * ================
- */
-
-function randomInt(low, high) {
-    return Math.floor(Math.random() * (high - low + 1) + low)
-}
 
 function handleMessages(bot, message, text) {
     if (text.toLowerCase().includes('hello')) {
         greetings(bot, message);
     } else if (text.toLowerCase().includes('joke')) {
         joke(bot, message);
-    } else if (text.toLowerCase().includes('cheer')) {
-        cheers(bot, message);
+    // } else if (text.toLowerCase().includes('cheer')) {
+        // cheers(bot, message);
     } else if (text.toLowerCase().includes('weather')) {
         weather(bot, message, 'Toronto');
     } else if (text.toLowerCase().includes('webhook')) {
@@ -398,4 +161,230 @@ function handleMessages(bot, message, text) {
     } else {
         bot.reply(message, 'I heard you loud and clear boss.');
     }
+}*/
+
+controller.hears(new RegExp('^.*cheer.*$', 'i'), 'direct_mention, mention, direct_message', function (bot, message) {
+    cheer(bot, message);
+});
+
+controller.hears(new RegExp('^.*joke.*$', 'i'), 'direct_mention, mention, direct_message', function (bot, message) {
+    joke(bot, message);
+});
+
+controller.hears(new RegExp('^.*weather.*$', 'i'), 'direct_mention, mention, direct_message', function (bot, message) {
+    var split = message.text.split(" ");
+    var hook = 'in';
+    var hook_found = false;
+    for (var i = 0; i < split.length; i++) {
+        if (split[i] === hook && i+1 < split.length) {    
+            weather(bot, message, split[i+1], null);
+            hook_found = true;
+            break;
+        }
+    }
+    if (!hook_found) weather(bot, message, null, null);
+});
+
+controller.hears(['hi', 'hello', 'hey', 'Hi', 'Hello', 'Hey'], 'direct_mention, mention, direct_message', function (bot, message) {
+    greetings(bot, message);
+});
+
+/**
+ * Any un-handled direct mention gets a reaction and a pat response!
+ */
+controller.on('direct_message, mention, direct_mention', function (bot, message) {
+    console.log(message);
+
+    bot.api.reactions.add({
+    timestamp: message.ts,
+    channel: message.channel,
+    name: 'robot_face',
+        }, function (err) {
+    if (err) {
+       console.log(err)
+    }
+    bot.reply(message, 'I heard you loud and clear boss.');
+    });
+});
+
+/**
+ * ===================
+ * Slash Commands
+ * ===================
+ */ 
+
+controller.on('slash_command', function(bot, message) {
+    bot.replyAcknowledge();
+    // console.log('SLASH MESSAGE ', message);
+
+    switch (message.command) {
+        case "/echo":
+            bot.replyPrivate(message, 'ECHO! Echo! echo! echo...');
+            break;
+        case "/msgall":
+            bot.replyPrivate(message, 'I\'m on it! Messaging all channels ...');
+            var channelTypes = {types: 'public_channel, private_channel',};
+            postToChannels(bot, message, channelTypes);
+            break;
+        case "/msgpublic":
+            bot.replyPrivate(message, 'I\'m on it! Messaging public channels ...');
+            postToChannels(bot, message, {});
+            break;
+        case "/weather":
+            var message_options = message.text.split(" ");
+            // console.log(message_options);
+            weather(bot, message, message_options[0], message_options[1]);
+            break;
+        default:
+            bot.replyPrivate(message, 'Did not recognize that command, sorry!');
+    }
+});
+
+function postToChannels(bot, message, channelTypes) {
+    bot.api.conversations.list(channelTypes, function(err, response) {
+        if (err) {
+            console.log('Problem with getting list of channels: ', err);
+        } else {
+            response.channels.forEach(function(channel) {
+                // console.log(channel.id); 
+                var message_to_channel = {
+                    channel: channel.id,
+                    text: message.text,
+                };
+                bot.api.chat.postMessage(message_to_channel, function(err, response) {
+                    if (err) console.log(err);
+                });
+            });
+        }
+    });
+}
+
+/**
+ * =======================
+ * Core Message Functions
+ * =======================
+ */ 
+
+function joke(bot, message) {
+    switch (randomInt(0, 3)) {
+        case 0:
+            bot.reply(message, 'This one is hilarious!');
+            break;
+        case 1:
+            bot.reply(message, 'Oh, this one is a gut-wrencher!');
+            break;
+        case 2: 
+            bot.reply(message, 'This one\'s a personal favourite!');
+            break;
+        default:
+            bot.reply(message, 'Here\'s a joke!');
+    }
+
+    axios({
+        url: "https://icanhazdadjoke.com/",
+        method: 'get',
+        headers: {"Accept" : "application/json",
+                "User-Agent" : "Slackbot for fun (https://github.com/LyMarco/goliath-bot)"
+            }
+    })
+    .then(response => {
+        // console.log(response.data.joke);
+        bot.reply(message, response.data.joke);
+    })
+    .catch(error => {
+        console.log(error);
+    })
+}
+
+function weather(bot, message, city, countryCode) {
+    if (city == null || city === '') {
+        city = 'Toronto';
+        countryCode = 'CA';
+    }
+
+    // console.log('https://api.openweathermap.org/data/2.5/find?q='+city+'&units=metric&appid=' + process.env.OWM_API_KEY);
+
+    axios({
+        url: 'https://api.openweathermap.org/data/2.5/find?q='+city+','+countryCode+'&units=metric&appid=' + process.env.OWM_API_KEY,
+        method: 'get',
+    })
+    .then(response => {
+        var weather_data = response.data.list[0];
+
+        if (weather_data == null) {
+            bot.reply(message, 'We couldn\'t find that city!');
+            throw "Error: No returning weather data";
+        }
+
+        var weather_info = 'Right now in ' + weather_data.name + ', ' + weather_data.sys.country + ' we\'re experiencing ' + weather_data.weather[0].description;
+        weather_info += '\n The current temperature is ' + weather_data.main.temp + ' degrees!';
+        weather_info += '\n Humidity is at ' + weather_data.main.humidity + '%, and wind speed is ' + msTokph(weather_data.wind.speed) + 'km/h!';
+
+        // console.log(response.data);
+        // console.log(weather_data.main);
+        bot.reply(message, weather_info);
+    })
+    .catch(error => {
+        console.log(error);
+    })
+}
+
+async function cheer(bot, message) {
+    var cheerNumber = randomInt(0, 9);
+
+    // await cheerHelper(bot, message);
+    
+    bot.reply(message, 'Oh, here\'s a good one!'); 
+    
+    fs.readFile('Cheers/' + cheerNumber + '.txt', 'utf8', (err, data) => {
+        if (err) console.log(err);
+        bot.reply(message, data);
+    });
+   
+}
+
+// I'm really bad at async
+async function cheerHelper(bot, message) {
+
+    switch (randomInt(0, 3)) {
+        case 0:
+            // return 'Oh, here\'s a good one!';
+            bot.reply(message, 'Oh, here\'s a good one!');
+            break;
+        case 1:
+            // return 'This cheer\'s pretty hype!';
+            bot.reply(message, 'This cheer\'s pretty hype!');
+            break;
+        case 2: 
+            // return 'This one\'s a personal favourite!';
+            bot.reply(message, 'This one\'s a personal favourite!');
+            break;
+        default:
+            // return 'Here\'s a cheer!';
+            bot.reply(message, 'Here\'s a cheer!');
+    }
+}
+
+function greetings(bot, message) {
+    bot.reply(message, 'Hello!');
+}
+
+/**
+ * =============================
+ * ==== Core bot logic end =====
+ * =============================
+ */
+
+/**
+ * ================
+ * Helper functions
+ * ================
+ */
+
+function randomInt(low, high) {
+    return Math.floor(Math.random() * (high - low + 1) + low)
+}
+
+function msTokph(ms) {
+    return (ms*3.6).toFixed(2);
 }
