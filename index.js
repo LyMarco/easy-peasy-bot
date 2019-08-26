@@ -113,56 +113,6 @@ controller.on('bot_channel_join', function (bot, message) {
  * ========================
  */
 
-/*controller.on('direct_message, direct_mention, mention', function (bot, message) {
-    handleMessages(bot, message, message.text);
-});
-
-function handleMessages(bot, message, text) {
-    if (text.toLowerCase().includes('hello')) {
-        greetings(bot, message);
-    } else if (text.toLowerCase().includes('joke')) {
-        joke(bot, message);
-    // } else if (text.toLowerCase().includes('cheer')) {
-        // cheers(bot, message);
-    } else if (text.toLowerCase().includes('weather')) {
-        weather(bot, message, 'Toronto');
-    } else if (text.toLowerCase().includes('webhook')) {
-        console.log(bot.config.incoming_webhook.url);
-            bot.sendWebhook({
-                text: message.text,
-            } , function (err, response) {
-                if (err) {
-                    console.log('webhook error', err);
-                }
-            });
-    } else if (text.toLowerCase().includes('post')) {
-        bot.api.channels.list({}, function(err, response) {
-            if (err) {
-                console.log(err);
-            } else {
-                response.channels.forEach(function(channel) {
-                    console.log(channel.id); 
-                    var message_to_channel = {
-                        
-                        channel: channel.id,
-                        text: 'hello',
-                    };
-
-                    bot.api.chat.postMessage(message_to_channel, function(err, response) {
-                        if (err) {
-                            console.log(err);
-                        }
-                        console.log(response);
-                    });
-                });
-            }
-        });
-        
-    } else {
-        bot.reply(message, 'I heard you loud and clear boss.');
-    }
-}*/
-
 controller.hears(new RegExp('^.*cheer.*$', 'i'), 'direct_mention, mention, direct_message', function (bot, message) {
     cheer(bot, message);
 });
@@ -288,7 +238,6 @@ function joke(bot, message) {
             }
     })
     .then(response => {
-        // console.log(response.data.joke);
         bot.reply(message, response.data.joke);
     })
     .catch(error => {
@@ -301,8 +250,6 @@ function weather(bot, message, city, countryCode) {
         city = 'Toronto';
         countryCode = 'CA';
     }
-
-    // console.log('https://api.openweathermap.org/data/2.5/find?q='+city+'&units=metric&appid=' + process.env.OWM_API_KEY);
 
     axios({
         url: 'https://api.openweathermap.org/data/2.5/find?q='+city+','+countryCode+'&units=metric&appid=' + process.env.OWM_API_KEY,
