@@ -127,7 +127,7 @@ controller.hears(new RegExp('^.*weather.*$', 'i'), 'direct_mention, mention, dir
     var hook_found = false;
     for (var i = 0; i < split.length; i++) {
         if (split[i] === hook && i+1 < split.length) {    
-            weather(bot, message, split[i+1], null);
+            weather(bot, message, split[i+1].replace(/[.,\/#?!$%\^&\*;:{}=\-_`~()]/g,"").replace(/\s{2,}/g," "), null);
             hook_found = true;
             break;
         }
