@@ -177,15 +177,19 @@ controller.on('slash_command', function(bot, message) {
 
     switch (message.command) {
         case "/echo":
-            bot.replyPrivate(message, 'ECHO! Echo! echo! echo...');
+            bot.reply(message, 'ECHO! Echo! echo! echo...');
+            break;
+        case "/notifyall":
+            var channelTypes = {types: 'public_channel, private_channel',};
+            postToChannels(bot, message, channelTypes);
             break;
         case "/msgall":
-            bot.replyPrivate(message, 'I\'m on it! Messaging all channels ...');
+            bot.reply(message, 'I\'m on it! Messaging all channels ...');
             var channelTypes = {types: 'public_channel, private_channel',};
             postToChannels(bot, message, channelTypes);
             break;
         case "/msgpublic":
-            bot.replyPrivate(message, 'I\'m on it! Messaging public channels ...');
+            bot.reply(message, 'I\'m on it! Messaging public channels ...');
             postToChannels(bot, message, {});
             break;
         case "/weather":
@@ -194,7 +198,7 @@ controller.on('slash_command', function(bot, message) {
             weather(bot, message, message_options[0], message_options[1]);
             break;
         default:
-            bot.replyPrivate(message, 'Did not recognize that command, sorry!');
+            bot.reply(message, 'Did not recognize that command, sorry!');
     }
 });
 
@@ -325,10 +329,10 @@ function react(bot, message, reaction) {
         timestamp: message.ts,
         channel: message.channel,
         name: reaction,
-        }, function (err) {
-            if (err) {
-                console.log(err);
-            }
+    }, function (err) {
+        if (err) {
+            console.log(err);
+        }
     });
 }
 
