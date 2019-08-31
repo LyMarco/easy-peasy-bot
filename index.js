@@ -135,6 +135,14 @@ controller.hears(new RegExp('^.*weather.*$', 'i'), 'direct_mention, mention, dir
     if (!hook_found) weather(bot, message, null, null);
 });
 
+controller.hears(new RegExp('^.*love.*$', 'i'), 'ambient', function(bot, message) {
+    react(bot, message, 'heart');
+})
+
+controller.hears(new RegExp('^NEW$'), 'ambient', function(bot, message) {
+    bot.reply(message, 'COLLEGE');
+})
+
 controller.hears(['hi', 'hello', 'hey', 'Hi', 'Hello', 'Hey'], 'direct_mention, mention, direct_message', function (bot, message) {
     greetings(bot, message);
 });
@@ -151,7 +159,7 @@ controller.on('direct_message, mention, direct_mention', function (bot, message)
     name: 'robot_face',
         }, function (err) {
     if (err) {
-       console.log(err)
+       console.log(err);
     }
     bot.reply(message, 'I heard you loud and clear boss.');
     });
@@ -310,6 +318,18 @@ async function cheerHelper(bot, message) {
             // return 'Here\'s a cheer!';
             bot.reply(message, 'Here\'s a cheer!');
     }
+}
+
+function react(bot, message, reaction) {
+    bot.api.reactions.add({
+        timestamp: message.ts,
+        channel: message.channel,
+        name: reaction,
+        }, function (err) {
+            if (err) {
+                console.log(err);
+            }
+    });
 }
 
 function greetings(bot, message) {
