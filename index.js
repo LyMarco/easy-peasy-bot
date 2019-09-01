@@ -3,7 +3,7 @@
  */
 
 // For development, using a .env file to quickly deploy environment variables (ty Code Realm)
-require('dotenv').config(); 
+// require('dotenv').config(); 
 
 /**
  * Define a function for initiating a conversation on installation
