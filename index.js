@@ -3,7 +3,13 @@
  */
 
 // For development, using a .env file to quickly deploy environment variables (ty Code Realm)
-// require('dotenv').config(); 
+require('dotenv').config(); 
+
+// Imports
+const fs = require('fs');  
+const readline = require('readline');
+const axios = require('axios');
+const schedule = require('node-schedule');
 
 /**
  * Define a function for initiating a conversation on installation
@@ -83,7 +89,7 @@ if (bot_capable || command_capable) {
 // Handle events related to the websocket connection to Slack
 controller.on('rtm_open', function (bot) {
     console.log('** The RTM api just connected!');
-    myBot = bot;
+    startWeatherReminders(bot);
 });
 
 controller.on('rtm_close', function (bot) {
@@ -97,10 +103,6 @@ controller.on('rtm_close', function (bot) {
  * =====  Core bot logic =======
  * =============================
  */
-
-const fs = require('fs');  
-const readline = require('readline');
-const axios = require('axios');
 
 controller.on('bot_channel_join', function (bot, message) {
     bot.reply(message, "I'm here!");
@@ -259,9 +261,65 @@ function postToChannels(bot, message, channelTypes) {
 
 /**
  * ===================
- * Reminders
+ * Weather Reminders
  * ===================
  */ 
+
+var startDateString = '2019-09-01';
+// var job = schedule.scheduleJob(date, function() {
+//     console.log()
+// });
+
+function startWeatherReminders(bot) {
+    var min = 0;
+    var max = 2;
+    var weatherInterval = null;
+    for (var i = min; i <= max; i ++) {
+        morningWeather = new Date(startDateString);
+        afternoonWeather = new Date(startDateString);
+        // console.log('Start date : ', morningWeather);
+        // We set UTC hours to add 4 since we want to be 4 hours ahead of UTC
+        // morningWeather.setDate(morningWeather.getDate() + i)
+        // morningWeather.setUTCHours(7 + 4);
+        // afternoonWeather.setDate(afternoonWeather.getDate() + i)
+        // afternoonWeather.setUTCHours(12 + 4, 30);
+        // We set hours to add 4 since we want to be 4 hours ahead of UTC
+        morningWeather.setUTCHours(new Date().getHours() + 4, new Date().getMinutes() + 1 + i);
+        afternoonWeather.setUTCHours(new Date().getHours() + 4, new Date().getMinutes() + 3 + i);
+        console.log('Attempting to schedule :', morningWeather);
+        var morningJob = schedule.scheduleJob(morningWeather, function (jobCycle, jobMin, jobMax, bot) {
+            if (jobCycle == min) {
+                weatherInterval = startWeatherChecks(bot);
+            }
+            weather(bot, null, null, null);
+            console.log('MORNING JOB TRIGGERED : ', jobCycle);
+        }.bind(null, i, min, max, bot));
+
+        console.log('Attempting to schedule :', afternoonWeather);
+        var afternoonJob = schedule.scheduleJob(afternoonWeather, function (jobCycle, jobMin, jobMax, bot) {
+            if (jobCycle == max && weatherInterval != null) {
+                console.log('Trying to stop weather checks')
+                stopWeatherChecks(weatherInterval);
+            }
+            weather(bot, null, 'London', null);
+            console.log('AFTERNOON JOB TRIGGERED : ', jobCycle);
+        }.bind(null, i, min, max, bot));
+    }
+}
+
+function startWeatherChecks(bot) {
+    console.log('Weather intervals started');
+    var weatherInterval = setInterval(function() {
+        // weather(bot, null, null, null);
+        console.log('weatherInterval', new Date());
+    }, '30000');
+    return weatherInterval;
+}
+
+function stopWeatherChecks(interval) {
+    console.log('Weather intervals ended!');
+    clearInterval(interval);
+}
 
 /**
  * =======================
@@ -300,6 +358,7 @@ function joke(bot, message) {
 }
 
 function weather(bot, message, city, countryCode) {
+    // Handle parameters
     if (city == null || city === '') {
         city = 'Toronto';
         countryCode = 'CA';
@@ -323,7 +382,17 @@ function weather(bot, message, city, countryCode) {
 
         // console.log(response.data);
         // console.log(weather_data.main);
-        bot.reply(message, weather_info);
+        if (message != null) {
+            bot.reply(message, weather_info);
+        } else {
+            weatherReminder = {
+                channel: '#general',
+                text: weather_info,
+            };
+            bot.api.chat.postMessage(weatherReminder, function(err, response) {
+                if (err) console.log(err);
+            });
+        }
     })
     .catch(error => {
         console.log(error);
