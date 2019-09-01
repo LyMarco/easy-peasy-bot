@@ -160,7 +160,7 @@ controller.hears(['hi', 'hello', 'hey', 'Hi', 'Hello', 'Hey'], 'direct_mention, 
 /**
  * Check for fun easter-egg reactions and memes.
  */
-controller.on('ambient', function (bot, message) {
+controller.on('ambient, direct_message', function (bot, message) {
     checkReaction(bot, message);
     checkMessage(bot, message);
 });
