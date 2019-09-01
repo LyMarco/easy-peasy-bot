@@ -170,7 +170,7 @@ function checkReaction(bot, message) {
         "heart": new RegExp('^.*(love|:heart.*:).*$', 'i'),
         "newroots": new RegExp('^.*(new college|orientation|sprout|root|theme).*$', 'i'),
         "pika": new RegExp('^.*(surprise|shock|:open_mouth:).*$', 'i'),
-        "lambsauce": new RegExp('^.*(angry|mad|breakfast|lunch|dinner).*$', 'i'),
+        "lambsauce": new RegExp('^.*(angry |mad|breakfast|lunch|dinner).*$', 'i'),
         "dancingbanana": new RegExp('^.*( fun).*$', 'i'),
         "yum": new RegExp('^.*(food).*$', 'i'),
         "pride": new RegExp('^.* pride.*$', 'i'),
