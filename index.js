@@ -272,26 +272,25 @@ var startDateString = '2019-09-01';
 
 function startWeatherReminders(bot) {
     var min = 0;
-    var max = 2;
+    var max = 4;
     var weatherInterval = null;
     for (var i = min; i <= max; i ++) {
         morningWeather = new Date(startDateString);
         afternoonWeather = new Date(startDateString);
         // console.log('Start date : ', morningWeather);
         // We set UTC hours to add 4 since we want to be 4 hours ahead of UTC
-        // morningWeather.setDate(morningWeather.getDate() + i)
-        // morningWeather.setUTCHours(7 + 4);
-        // afternoonWeather.setDate(afternoonWeather.getDate() + i)
-        // afternoonWeather.setUTCHours(12 + 4, 30);
-        // We set hours to add 4 since we want to be 4 hours ahead of UTC
+        /*morningWeather.setDate(morningWeather.getDate() + i)
+        morningWeather.setUTCHours(7 + 4);
+        afternoonWeather.setDate(afternoonWeather.getDate() + i)
+        afternoonWeather.setUTCHours(12 + 4, 30);*/
         morningWeather.setUTCHours(new Date().getHours() + 4, new Date().getMinutes() + 1 + i);
-        afternoonWeather.setUTCHours(new Date().getHours() + 4, new Date().getMinutes() + 3 + i);
+        afternoonWeather.setUTCHours(new Date().getHours() + 4, new Date().getMinutes() + max+1 + i);
         console.log('Attempting to schedule :', morningWeather);
         var morningJob = schedule.scheduleJob(morningWeather, function (jobCycle, jobMin, jobMax, bot) {
             if (jobCycle == min) {
                 weatherInterval = startWeatherChecks(bot);
             }
-            weather(bot, null, null, null);
+            // weather(bot, null, null, null);
             console.log('MORNING JOB TRIGGERED : ', jobCycle);
         }.bind(null, i, min, max, bot));
 
@@ -301,17 +300,20 @@ function startWeatherReminders(bot) {
                 console.log('Trying to stop weather checks')
                 stopWeatherChecks(weatherInterval);
             }
-            weather(bot, null, 'London', null);
+            // weather(bot, null, null, null);
             console.log('AFTERNOON JOB TRIGGERED : ', jobCycle);
         }.bind(null, i, min, max, bot));
     }
 }
 
+var currentWeather = null;
 function startWeatherChecks(bot) {
     console.log('Weather intervals started');
-    var weatherInterval = setInterval(function() {
-        // weather(bot, null, null, null);
-        console.log('weatherInterval', new Date());
+    
+    var weatherInterval = setInterval(async function() {
+        console.log('weatherInterval', new Date(), currentWeather);
+        checkWeatherChange(bot);
+        // console.log('New weather: ', currentWeather);
     }, '30000');
     return weatherInterval;
 }
@@ -397,6 +399,64 @@ function weather(bot, message, city, countryCode) {
     .catch(error => {
         console.log(error);
     })
+}
+
+function checkWeatherChange(bot) {
+    var city = 'Toronto';
+    var countryCode = 'CA';
+    axios({
+        url: 'https://api.openweathermap.org/data/2.5/find?q='+city+','+countryCode+'&units=metric&appid=' + process.env.OWM_API_KEY,
+        method: 'get',
+    })
+    .then(response => {
+        var weather_data = response.data.list[0];
+
+        if (weather_data == null) {
+            throw "Error: No returning weather data";
+        }
+        if (currentWeather == null) {
+            currentWeather = weather_data.weather[0].main;
+            return;
+        }
+        if (weather_data.weather[0].main !== currentWeather) {
+            var intro = getWeatherIntro(weather_data.weather[0].main); 
+            var weather_info = intro + ' The weather has changed to ' + weather_data.weather[0].description;
+            weather_info += '\n The current temperature is ' + weather_data.main.temp + ' degrees!';
+            weather_info += '\n Humidity is at ' + weather_data.main.humidity + '%, and wind speed is ' + msTokph(weather_data.wind.speed) + 'km/h!';
+
+            weatherReminder = {
+                channel: '#general',
+                text: weather_info,
+            };
+            bot.api.chat.postMessage(weatherReminder, function(err, response) {
+                if (err) console.log(err);
+            });
+        } 
+        console.log('Weather main: ', weather_data.weather[0].main)
+        currentWeather = weather_data.weather[0].main;
+    })
+    .catch(error => {
+        console.log(error);
+    })
+}
+
+function getWeatherIntro(weatherMain) {
+    switch (weatherMain) {
+        case 'Clear':
+            return 'All clear!';
+        case 'Clouds':
+            return 'Heads up!';
+        case 'Rain': 
+            return 'Umbrellas out!';
+        case 'Drizzle':
+            return 'Watch out!';
+        case 'Thunderstorm':
+            return 'Take cover!';
+        case 'Snow':
+            return 'Brrrr.';
+        default:
+            throw "Weather change not logged";
+    }
 }
 
 async function cheer(bot, message) {
