@@ -188,10 +188,10 @@ function checkReaction(bot, message) {
 
 function checkMessage(bot, message) {
     messageDict = {
-        "COLLEGE": new RegExp('^NEW$'),
-        "GOLD": new RegExp('^GREEN$'),
-        "HOT": new RegExp('^RED$'),
-        ":salad:": new RegExp('^.*(:angrypointy:).*$'),
+        "COLLEGE": new RegExp('^NEW ?$'),
+        "GOLD": new RegExp('^GREEN ?$'),
+        "HOT": new RegExp('^RED ?$'),
+        ":salad:": new RegExp('^.*:angrypointy:.*$'),
     }
     for(var key in messageDict) {
         var regex = messageDict[key];
@@ -256,6 +256,12 @@ function postToChannels(bot, message, channelTypes) {
         }
     });
 }
+
+/**
+ * ===================
+ * Reminders
+ * ===================
+ */ 
 
 /**
  * =======================
