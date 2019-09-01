@@ -135,14 +135,6 @@ controller.hears(new RegExp('^.*weather.*$', 'i'), 'direct_mention, mention, dir
     if (!hook_found) weather(bot, message, null, null);
 });
 
-controller.hears(new RegExp('^.*love.*$', 'i'), 'ambient', function(bot, message) {
-    react(bot, message, 'heart');
-})
-
-controller.hears(new RegExp('^NEW$'), 'ambient', function(bot, message) {
-    bot.reply(message, 'COLLEGE');
-})
-
 controller.hears(['hi', 'hello', 'hey', 'Hi', 'Hello', 'Hey'], 'direct_mention, mention, direct_message', function (bot, message) {
     greetings(bot, message);
 });
@@ -150,20 +142,79 @@ controller.hears(['hi', 'hello', 'hey', 'Hi', 'Hello', 'Hey'], 'direct_mention, 
 /**
  * Any un-handled direct mention gets a reaction and a pat response!
  */
-controller.on('direct_message, mention, direct_mention', function (bot, message) {
+/*controller.on('direct_message, mention, direct_mention', function (bot, message) {
     console.log(message);
 
     bot.api.reactions.add({
     timestamp: message.ts,
     channel: message.channel,
-    name: 'robot_face',
+    name: 'goliath',
         }, function (err) {
     if (err) {
        console.log(err);
     }
     bot.reply(message, 'I heard you loud and clear boss.');
     });
+});*/
+
+/*controller.hears(new RegExp('^.*love.*$', 'i'), 'ambient', function(bot, message) {
+    react(bot, message, 'heart');
+})*/
+
+/**
+ * Check for fun easter-egg reactions and memes.
+ */
+controller.on('ambient', function (bot, message) {
+    checkReaction(bot, message);
+    checkMessage(bot, message);
 });
+
+function checkReaction(bot, message) {
+    /*var love = new RegExp('^.*(love|:heart.*:).*$', 'i');
+    var newCollege = new RegExp('^.*(new college|orientation|sprout|root).*$', 'i');
+    var surprise = new RegExp('^.*(surprise|shock|:open_mouth:).*$', 'i');
+    var ramsay = new RegExp('^.*(angry|mad|breakfast|lunch|dinner).*$', 'i');
+    var banana = new RegExp('^.*(food).*$', 'i');
+    var pride = new RegExp('^.* pride.*$', 'i');
+    var slackEmoji = new RegExp('^.*slack.*$', 'i');
+    var fancy = new RegExp('^.*(ROM|fancy|dance).*$');*/
+    // var  = new RegExp('^.*().*$', 'i');
+    reactionDict = {
+        "heart": new RegExp('^.*(love|:heart.*:).*$', 'i'),
+        "newroots": new RegExp('^.*(new college|orientation|sprout|root|theme).*$', 'i'),
+        "pika": new RegExp('^.*(surprise|shock|:open_mouth:).*$', 'i'),
+        "lambsauce": new RegExp('^.*(angry|mad|breakfast|lunch|dinner).*$', 'i',
+        "dancingbanana": new RegExp('^.*( fun).*$', 'i'),
+        "yum": new RegExp('^.*(food).*$', 'i'),
+        "pride": new RegExp('^.* pride.*$', 'i'),
+        "slack": new RegExp('^.*slack.*$', 'i'),
+        "bowtie": new RegExp('^.*(ROM|fancy|dance).*$'),
+        "salad": new RegExp('^.*(:angrypointy:).*$'),
+    }
+
+    for(var key in reactionDict) {
+        var regex = reactionDict[key];
+        if (message.text.match(regex)) {
+            react(bot, message, key);
+        }
+    }
+}
+
+/*controller.hears(new RegExp('^NEW$'), 'ambient', function(bot, message) {
+    bot.reply(message, 'COLLEGE');
+})*/
+
+function checkMessage(bot, message) {
+    messageDict = {
+        "COLLEGE": new RegExp('^NEW$'),
+    }
+    for(var key in messageDict) {
+        var regex = messageDict[key];
+        if (message.text.match(regex)) {
+            bot.reply(message, key);
+        }
+    }
+}
 
 /**
  * ===================
@@ -337,7 +388,7 @@ function react(bot, message, reaction) {
 }
 
 function greetings(bot, message) {
-    bot.reply(message, 'Hello!');
+    bot.reply(message, '<@' + message.user + '> hello!');
 }
 
 /**
