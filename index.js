@@ -222,13 +222,23 @@ controller.on('slash_command', function(bot, message) {
             postToChannels(bot, message, channelTypes);
             break;
         case "/msgall":
-            bot.reply(message, 'I\'m on it! Messaging all channels ...');
-            var channelTypes = {types: 'public_channel, private_channel',};
-            postToChannels(bot, message, channelTypes);
+            /*var message_options = message.text.split(" ");
+            if (message_options[0] === 'nco19') {*/
+                bot.reply(message, 'I\'m on it! Messaging all channels ...');
+                var channelTypes = {types: 'public_channel, private_channel',};
+                postToChannels(bot, message, channelTypes);
+            /*} else {
+                bot.reply(message, 'Slash command failed: Incorrect passcode')
+            }*/
             break;
         case "/msgpublic":
-            bot.reply(message, 'I\'m on it! Messaging public channels ...');
-            postToChannels(bot, message, {});
+            /*var message_options = message.text.split(" ");
+            if (message_options[0] === 'nco19') {*/
+                bot.reply(message, 'I\'m on it! Messaging public channels ...');
+                postToChannels(bot, message, {});
+            /*} else {
+                bot.reply(message, 'Slash command failed: Incorrect passcode')
+            }*/
             break;
         case "/weather":
             var message_options = message.text.split(" ");
@@ -268,7 +278,7 @@ function postToChannel(bot, channelID, text) {
  * ===================
  */ 
 
-var startDateString = '2019-09-01';
+var startDateString = '2019-09-02';
 // var job = schedule.scheduleJob(date, function() {
 //     console.log()
 // });
@@ -281,16 +291,17 @@ function startWeatherReminders(bot) {
         var weatherInterval = null;
         morningWeather = new Date(startDateString);
         afternoonWeather = new Date(startDateString);
-        // eveningWeather = new Date(startDateString);
+        eveningWeather = new Date(startDateString);
         // We set UTC hours to add 4 since we want to be 4 hours ahead of UTC
-        /*morningWeather.setDate(morningWeather.getDate() + i)
+        morningWeather.setDate(morningWeather.getDate() + i);
         morningWeather.setUTCHours(7 + 4);
-        afternoonWeather.setDate(afternoonWeather.getDate() + i)
+        afternoonWeather.setDate(afternoonWeather.getDate() + i);
         afternoonWeather.setUTCHours(12 + 4, 30);
-        eveningWeather.setDate(evening)
-        */
-        morningWeather.setUTCHours(new Date().getHours() + 4, new Date().getMinutes() + 1 + i*5);
-        afternoonWeather.setUTCHours(new Date().getHours() + 4, new Date().getMinutes() + 3 + i*5);
+        eveningWeather.setDate(eveningWeather.getDate() + i);
+        eveningWeather.setUTCHours(18 + 4, 30);
+        
+        /*morningWeather.setUTCHours(new Date().getHours() + 4, new Date().getMinutes() + 1 + i*5);
+        afternoonWeather.setUTCHours(new Date().getHours() + 4, new Date().getMinutes() + 3 + i*5);*/
         console.log('Attempting to schedule morning:', morningWeather);
         var morningJob = schedule.scheduleJob(morningWeather, function (jobCycle, jobMin, jobMax, bot) {
             weather(bot, null, null, null);
@@ -300,21 +311,21 @@ function startWeatherReminders(bot) {
             // }
         }.bind(null, i, min, max, bot));
 
-        console.log('Attempting to schedule afternoon:', afternoonWeather);
+        console.log('Attempting to schedule afternoon:', afternoonWeather); 
         var afternoonJob = schedule.scheduleJob(afternoonWeather, function (jobCycle, jobMin, jobMax, bot) {
             weather(bot, null, null, null);
             console.log('AFTERNOON JOB TRIGGERED: ', jobCycle);
-            stopWeatherChecks(weatherInterval);
+            // stopWeatherChecks(weatherInterval);
         }.bind(null, i, min, max, bot));
 
-        /*console.log('Attempting to schedule evening:', eveningWeather);
+        console.log('Attempting to schedule evening:', eveningWeather);
         var eveningJob = schedule.scheduleJob(eveningWeather, function (jobCycle, jobMin, jobMax, bot) {
             weather(bot, null, null, null);
             console.log('EVENING JOB TRIGGERED: ', jobCycle);
             // if (jobCycle == max && weatherInterval != null) {
             stopWeatherChecks(weatherInterval);
             // }
-        }.bind(null, i, min, max, bot));*/
+        }.bind(null, i, min, max, bot));
     }
 }
 
@@ -323,7 +334,7 @@ function startWeatherChecks(bot) {
     console.log('Weather intervals started');
     
     var weatherInterval = setInterval(async function() {
-        console.log('weatherInterval', new Date(), currentWeather);
+        // console.log('weatherInterval', new Date(), currentWeather);
         checkWeatherChange(bot);
     }, '30000');
     return weatherInterval;
@@ -424,6 +435,7 @@ function checkWeatherChange(bot) {
         }
         if (currentWeather == null) {
             currentWeather = weather_data.weather[0].main;
+            console.log('Starting weather: ', currentWeather)
             return;
         }
         if (weather_data.weather[0].main !== currentWeather) {
@@ -433,8 +445,8 @@ function checkWeatherChange(bot) {
             weather_info += '\n Humidity is at ' + weather_data.main.humidity + '%, and wind speed is ' + msTokph(weather_data.wind.speed) + 'km/h!';
             postToChannel(bot, '#general', weather_info);
         } 
-        // console.log('Weather main: ', weather_data.weather[0].main)
         currentWeather = weather_data.weather[0].main;
+        console.log('Weather change logged: ',  currentWeather)
     })
     .catch(error => {
         console.log(error);
