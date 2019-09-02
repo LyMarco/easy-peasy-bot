@@ -222,23 +222,23 @@ controller.on('slash_command', function(bot, message) {
             postToChannels(bot, message, channelTypes);
             break;
         case "/msgall":
-            /*var message_options = message.text.split(" ");
-            if (message_options[0] === 'nco19') {*/
+            var message_options = message.text.split(" ");
+            if (message_options[0] === 'nco19') {
                 bot.reply(message, 'I\'m on it! Messaging all channels ...');
                 var channelTypes = {types: 'public_channel, private_channel',};
                 postToChannels(bot, message, channelTypes);
-            /*} else {
+            } else {
                 bot.reply(message, 'Slash command failed: Incorrect passcode')
-            }*/
+            }
             break;
         case "/msgpublic":
-            /*var message_options = message.text.split(" ");
-            if (message_options[0] === 'nco19') {*/
+            var message_options = message.text.split(" ");
+            if (message_options[0] === 'nco19') {
                 bot.reply(message, 'I\'m on it! Messaging public channels ...');
                 postToChannels(bot, message, {});
-            /*} else {
+            } else {
                 bot.reply(message, 'Slash command failed: Incorrect passcode')
-            }*/
+            }
             break;
         case "/weather":
             var message_options = message.text.split(" ");
