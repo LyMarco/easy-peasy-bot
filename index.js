@@ -89,7 +89,6 @@ if (bot_capable || command_capable) {
 // Handle events related to the websocket connection to Slack
 controller.on('rtm_open', function (bot) {
     console.log('** The RTM api just connected!');
-    startWeatherReminders(bot);
 });
 
 controller.on('rtm_close', function (bot) {
@@ -97,6 +96,8 @@ controller.on('rtm_close', function (bot) {
     // you may want to attempt to re-open
     // reStartRTM(bot);
 });
+
+startWeatherReminders(bot);
 
 /*function reStartRTM(bot) {
     bot.startRTM(function(err,bot,payload) {
