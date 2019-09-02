@@ -95,10 +95,10 @@ controller.on('rtm_open', function (bot) {
 controller.on('rtm_close', function (bot) {
     console.log('** The RTM api just closed');
     // you may want to attempt to re-open
-    reStartRTM(bot);
+    // reStartRTM(bot);
 });
 
-function reStartRTM(bot) {
+/*function reStartRTM(bot) {
     bot.startRTM(function(err,bot,payload) {
         if (err) {
             console.log('Failed to re-start RTM')
@@ -106,7 +106,7 @@ function reStartRTM(bot) {
         }
         console.log("RTM re-started!");
     }); 
-}
+}*/
 
 /**
  * =============================
