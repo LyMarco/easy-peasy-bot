@@ -360,7 +360,7 @@ function startWeatherChecks(bot) {
     var weatherInterval = setInterval(async function() {
         // console.log('weatherInterval', new Date(), currentWeather);
         checkWeatherChange(bot);
-    }, '30000');
+    }, '300000');
     return weatherInterval;
 }
 
