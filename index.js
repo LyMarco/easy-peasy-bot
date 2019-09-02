@@ -105,8 +105,7 @@ function reStartRTM(bot) {
             return setTimeout(reStartRTM, 60000, bot);
         }
         console.log("RTM re-started!");
-        });
-    });
+    }); 
 }
 
 /**
