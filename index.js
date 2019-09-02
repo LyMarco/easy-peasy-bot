@@ -462,9 +462,9 @@ function checkWeatherChange(bot) {
             weather_info += '\n The current temperature is ' + weather_data.main.temp + ' degrees!';
             weather_info += '\n Humidity is at ' + weather_data.main.humidity + '%, and wind speed is ' + msTokph(weather_data.wind.speed) + 'km/h!';
             postToChannel(bot, '#general', weather_info);
+            console.log('Weather change logged: ',  weather_data.weather[0].main)
         } 
         currentWeather = weather_data.weather[0].main;
-        console.log('Weather change logged: ',  currentWeather)
     })
     .catch(error => {
         console.log(error);
