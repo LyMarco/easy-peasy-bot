@@ -315,6 +315,7 @@ function startWeatherReminders(bot) {
         afternoonWeather.setUTCHours(new Date().getHours() + 4, new Date().getMinutes() + 3 + i*5);*/
         console.log('Attempting to schedule morning:', morningWeather);
         var morningJob = schedule.scheduleJob(morningWeather, function (jobCycle, jobMin, jobMax, bot) {
+            postToChannel(bot, '#general', 'Good morning!');
             weather(bot, null, null, null);
             console.log('MORNING JOB TRIGGERED: ', jobCycle);
             // if (jobCycle == min) {
@@ -324,6 +325,7 @@ function startWeatherReminders(bot) {
 
         console.log('Attempting to schedule afternoon:', afternoonWeather); 
         var afternoonJob = schedule.scheduleJob(afternoonWeather, function (jobCycle, jobMin, jobMax, bot) {
+            postToChannel(bot, '#general', 'Good afternoon!');
             weather(bot, null, null, null);
             console.log('AFTERNOON JOB TRIGGERED: ', jobCycle);
             // stopWeatherChecks(weatherInterval);
@@ -331,6 +333,7 @@ function startWeatherReminders(bot) {
 
         console.log('Attempting to schedule evening:', eveningWeather);
         var eveningJob = schedule.scheduleJob(eveningWeather, function (jobCycle, jobMin, jobMax, bot) {
+            postToChannel(bot, '#general', 'Good evening!');
             weather(bot, null, null, null);
             console.log('EVENING JOB TRIGGERED: ', jobCycle);
             // if (jobCycle == max && weatherInterval != null) {
