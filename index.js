@@ -3,7 +3,7 @@
  */
 
 // For development, using a .env file to quickly deploy environment variables (ty Code Realm)
-require('dotenv').config(); 
+// require('dotenv').config(); 
 
 // Imports
 const fs = require('fs');  
