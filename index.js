@@ -87,15 +87,15 @@ if (bot_capable || command_capable) {
  * Bad way to handle closing. Needs a fix.
  */
 // Handle events related to the websocket connection to Slack
+var schedules = [];
 controller.on('rtm_open', function (bot) {
     console.log('** The RTM api just connected!');
-    startWeatherReminders(bot);
+    schedules = startWeatherReminders(bot);
 });
 
 controller.on('rtm_close', function (bot) {
     console.log('** The RTM api just closed');
-    // you may want to attempt to re-open
-    // reStartRTM(bot);
+    stopWeatherReminders(bot);
 });
 
 
@@ -301,6 +301,7 @@ var startDateString = '2019-09-02';
 // });
 
 function startWeatherReminders(bot) {
+    var jobs = [];
     var min = 0;
     var max = 4;
     
@@ -346,6 +347,18 @@ function startWeatherReminders(bot) {
             stopWeatherChecks(weatherInterval);
             // }
         }.bind(null, i, min, max, bot));
+
+        jobs.push(morningJob);
+        jobs.push(afternoonJob);
+        jobs.push(eveningJob);
+    }
+    return jobs;
+}
+
+function stopWeatherReminders(bot) {
+    for(var job in schedules) {
+        job.cancel();
+        console.log('Cancelling Job');
     }
 }
 
