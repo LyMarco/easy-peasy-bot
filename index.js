@@ -195,6 +195,7 @@ function checkReaction(bot, message) {
         "pride": new RegExp('^.* pride.*$', 'i'),
         "slack": new RegExp('^.*slack.*$', 'i'),
         "bowtie": new RegExp('^.*(ROM|fancy|dance).*$'),
+        "todd": new RegExp('^.*(todd|dad).*$', 'i'),
     }
 
     for(var key in reactionDict) {
