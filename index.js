@@ -152,6 +152,12 @@ controller.hears(['hi', 'hello', 'hey', 'Hi', 'Hello', 'Hey'], 'direct_mention, 
     greetings(bot, message);
 });
 
+controller.hears(new RegExp('^echo .*$'), 'direct_message', function (bot, message) {
+    setTimeout(function () {
+        bot.reply(message, message.text.substring(5));
+    }, 15000);
+});
+
 /**
  * Any un-handled direct mention gets a reaction and a pat response!
  */
